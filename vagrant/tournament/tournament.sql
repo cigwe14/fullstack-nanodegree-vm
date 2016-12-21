@@ -6,4 +6,12 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
+DROP DATABASE IF EXISTS Tournament;
+
+CREATE DATABASE Tournament;
+
+CREATE TABLE Players(Id Serial, Name Text)
+CREATE TABLE PlayerStandings(Id, PlayerId, 
+
+CREATE TABLE Matches
 
