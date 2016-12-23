@@ -15,7 +15,8 @@ CREATE TABLE Players(Id Serial PRIMARY KEY,
 
 CREATE TABLE PlayerStandings(Id Serial PRIMARY KEY,
 				PlayerId INTEGER REFERENCES Players(Id) NOT NULL UNIQUE, 
-                                Score INTEGER NOT NULL
+                                Wins INTEGER NOT NULL,
+				Played INTEGER NOT NULL
                              ); 
 
 CREATE TABLE Matches(Id Serial PRIMARY KEY, 

@@ -13,15 +13,31 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
-
+    db = connect();
+    dbCursor = db.cursor();
+    dbCursor.execute("DELETE FROM Matches; UPDATE PlayerStandings SET Played = 0, Wins = 0");
+    dbCursor.close();
+    db.commit();
+    db.close(); 
 
 def deletePlayers():
     """Remove all the player records from the database."""
-
+    db = connect();
+    dbCursor = db.cursor();
+    dbCursor.execute("DELETE FROM PlayerStandings; DELETE FROM Players;");
+    dbCursor.close();
+    db.commit();
+    db.close();
 
 def countPlayers():
     """Returns the number of players currently registered."""
-
+    db = connect();
+    dbCursor = db.cursor();
+    dbCursor.execute("SELECT COUNT(*) FROM Players");
+    result = dbCursor.fetchone()
+    dbCursor.close();
+    db.close();
+    return result[0];
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -32,6 +48,13 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    db = connect();
+    dbCursor = db.cursor();
+    dbCursor.execute("INSERT INTO Players(name) VALUES (%s) RETURNING Id;", (name,));
+    dbCursor.execute("INSERT INTO PlayerStandings(PlayerId, Wins, Played) VALUES(%s, %s, %s)", (dbCursor.fetchone()[0], 0, 0));
+    dbCursor.close();
+    db.commit();
+    db.close();
 
 
 def playerStandings():
@@ -47,7 +70,17 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-
+    db = connect();
+    dbCursor = db.cursor();
+    dbCursor.execute("SELECT  p.Id, p.Name, ps.Wins, ps.Played " +
+                        " FROM PlayerStandings ps " +
+                        " LEFT JOIN Players p ON ps.PlayerId = p.Id "
+                        " ORDER BY ps.Wins DESC");
+    results = dbCursor.fetchall();                 
+    dbCursor.close();
+    db.commit();
+    db.close();    
+    return results;
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
@@ -56,7 +89,14 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
- 
+    db = connect();
+    dbCursor = db.cursor();
+    dbCursor.execute("INSERT INTO Matches(WinPlayerId, LosePlayerId) VALUES (%s, %s)", (winner, loser,));
+    dbCursor.execute("UPDATE PlayerStandings SET Played = Played + 1 WHERE PlayerId = %s OR PlayerId = %s", (winner, loser,));
+    dbCursor.execute("UPDATE PlayerStandings SET Wins = Wins + 1 WHERE PlayerId = %s", (winner,));
+    dbCursor.close();
+    db.commit();
+    db.close();  
  
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -73,5 +113,7 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-
+   db = connect();
+   dbCursor = db.cursor();
+   dbCursor.execute("SELECT pId, 
 
