@@ -111,9 +111,19 @@ def swissPairings():
         id1: the first player's unique id
         name1: the first player's name
         id2: the second player's unique id
-        name2: the second player's name
-    """
-   db = connect();
-   dbCursor = db.cursor();
-   dbCursor.execute("SELECT pId, 
-
+        name2: the second player's name"""
+    db = connect()
+    dbCursor = db.cursor();
+    dbCursor.execute("SELECT p.Id, p.Name " +
+                      " FROM Players p " +
+                          " INNER JOIN PlayerStandings ps ON p.Id = ps.PlayerId"+
+                       " ORDER BY ps.Wins DESC");
+    list = dbCursor.fetchall();
+    pairings = [
+		  (list[i-1][0], list[i-1][1], p[0],p[1])
+                  for  i, p in enumerate(list)
+                    if (i+1) % 2 == 0
+               ]
+    dbCursor.close();
+    db.close(); 
+    return pairings
