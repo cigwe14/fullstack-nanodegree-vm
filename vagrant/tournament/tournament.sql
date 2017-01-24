@@ -13,14 +13,9 @@ CREATE DATABASE Tournament;
 CREATE TABLE Players(Id Serial PRIMARY KEY, 
                      Name VARCHAR(100));
 
-CREATE TABLE PlayerStandings(Id Serial PRIMARY KEY,
-				PlayerId INTEGER REFERENCES Players(Id) NOT NULL UNIQUE, 
-                                Wins INTEGER NOT NULL,
-				Played INTEGER NOT NULL
-                             ); 
-
 CREATE TABLE Matches(Id Serial PRIMARY KEY, 
                         WinPlayerId INTEGER REFERENCES Players(Id) NOT NULL, 
                         LosePlayerId INTEGER REFERENCES Players(Id) NOT NULL,
                         UNIQUE (WinPlayerId, LosePlayerId));
+
 
